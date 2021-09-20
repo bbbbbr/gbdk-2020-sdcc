@@ -1,0 +1,56 @@
+name: Build SDCC
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  # Triggers the workflow on push or pull request events but only for the develop branch
+  # push:
+  #   branches: [ develop ]
+  # pull_request:
+  #   branches: [ develop ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-20.04
+          - macos-10.15
+          - windows-2019
+        include:
+          - os: ubuntu-20.04
+            name: Linux-x64
+#          - os: macos-10.15
+#            name: MacOS-x64
+#          - os: windows-2019
+#            name: Windows-x64
+#      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+
+      # ==== Download sources ====
+      - name: Linux Depends
+        if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64')
+        run: |
+          # To generate a given source tarball, but it can take a while sometimes
+          # https://sourceforge.net/p/sdcc/code/12539/tarball?path=
+          # That eventually generates:
+          # 
+          curl -Lo sdcc.tar.zip https://sourceforge.net/code-snapshots/svn/s/sd/sdcc/code/sdcc-code-r12539-trunk.zip
+          unzip sdcc.tar.zip
+          tar xvf sdcc.tar
+
+      # ==== Build SDCC ====
+      - name: Build SDCC
+        if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64')
+        shell: bash
+        run: |          
+          cd sdcc
+          # For mingw64 cross build: --host=x86_64-w64-mingw32
+          ./configure --enable-gbz80-port --enable-z80-port --disable-mcs51-port --disable-z180-port --disable-r2k-port --disable-r2ka-port --disable-r3ka-port --disable-tlcs90-port --disable-ez80_z80-port --disable-z80n-port --disable-ds390-port --disable-ds400-port --disable-pic14-port --disable-pic16-port --disable-hc08-port --disable-s08-port --disable-stm8-port --disable-pdk13-port --disable-pdk14-port --disable-pdk15-port --disable-ucsim --disable-doc
+          make
+          cd bin
+          strip *
+          cd ..
+          cd ..
+          
