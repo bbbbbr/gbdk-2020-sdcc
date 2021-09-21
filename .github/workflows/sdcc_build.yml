@@ -36,7 +36,9 @@ jobs:
           # https://sourceforge.net/p/sdcc/code/12539/tarball?path=
           # That eventually generates:
           # 
-          curl -Lo sdcc.zip https://sourceforge.net/code-snapshots/svn/s/sd/sdcc/code/sdcc-code-r12539-trunk.zip
+          # curl -Lo sdcc.zip https://sourceforge.net/code-snapshots/svn/s/sd/sdcc/code/sdcc-code-r12539-trunk.zip
+          # Use a cached version for now, faster.
+           curl -Lo sdcc.zip https://github.com/bbbbbr/gbdk-2020-sdcc/releases/download/sdcc-src-12539-trunk/SDCC-download-snapshot-generated--sdcc-code-r12539-trunk.zip
           unzip sdcc.zip          
           # tar xvf sdcc.tar          
 
