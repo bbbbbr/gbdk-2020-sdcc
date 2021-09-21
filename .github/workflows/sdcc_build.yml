@@ -48,7 +48,9 @@ jobs:
           # REQUIRED: Specify the required boost version
           # A list of supported versions can be found here: 
           # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
-          boost_version: 1.73.0
+          # boost_version: 1.73.0
+          # (1.59 isn't required but it seems there is some preference for older. see SDCC Changelog)
+          boost_version: 1.59.0
           # OPTIONAL: Specify a platform version
           platform_version: 18.04
           # OPTIONAL: Specify a custom install location
@@ -65,7 +67,7 @@ jobs:
           cd sdcc-code-r12539-trunk/sdcc
           # cd sdcc
           # For mingw64 cross build: --host=x86_64-w64-mingw32
-          ./configure --enable-gbz80-port --enable-z80-port --disable-mcs51-port --disable-z180-port --disable-r2k-port --disable-r2ka-port --disable-r3ka-port --disable-tlcs90-port --disable-ez80_z80-port --disable-z80n-port --disable-ds390-port --disable-ds400-port --disable-pic14-port --disable-pic16-port --disable-hc08-port --disable-s08-port --disable-stm8-port --disable-pdk13-port --disable-pdk14-port --disable-pdk15-port --disable-ucsim --disable-doc
+          ./configure --enable-gbz80-port --enable-z80-port --with-boost=/home/runner/work/gbdk-2020-sdcc/gbdk-2020-sdcc/boost/boost --disable-mcs51-port --disable-z180-port --disable-r2k-port --disable-r2ka-port --disable-r3ka-port --disable-tlcs90-port --disable-ez80_z80-port --disable-z80n-port --disable-ds390-port --disable-ds400-port --disable-pic14-port --disable-pic16-port --disable-hc08-port --disable-s08-port --disable-stm8-port --disable-pdk13-port --disable-pdk14-port --disable-pdk15-port --disable-ucsim --disable-doc
           make
           cd bin
           strip *
