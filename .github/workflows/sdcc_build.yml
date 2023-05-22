@@ -62,7 +62,7 @@ jobs:
           cp -f support/sdbinutils/binutils/sdnm bin
           cp -f support/cpp/gcc/cc1 bin
           cp -f support/cpp/gcc/cpp sdcpp
-          strip bin/*
+          strip bin/* || true
           ls -la bin          
           cd ../..
 
