@@ -30,7 +30,7 @@ jobs:
         shell: bash
         run: |
           export SDCC_VERSION=14068
-          echo "SDCCV_VER=$SDCC_VERSION" >> $GITHUB_ENV
+          echo "SDCC_VER=$SDCC_VERSION" >> $GITHUB_ENV
           echo "BUILD_PACKAGE_FILENAME=sdcc-$SDCC_VERSION-${{ matrix.name }}.tar.gz" >> $GITHUB_ENV
 
       # ==== Install Dependencies ====
