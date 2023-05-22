@@ -1,4 +1,4 @@
-name: Build SDCC
+name: Build SDCC for GBDK
 
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -11,70 +11,70 @@ on:
 
 jobs:
   build:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os:
-          - ubuntu-20.04
-#          - macos-10.15
-#          - windows-2019
         include:
           - os: ubuntu-20.04
             name: Linux-x64
-#          - os: macos-10.15
+#          - os: macos-11
 #            name: MacOS-x64
-#          - os: windows-2019
-#            name: Windows-x64
-#      fail-fast: false
-    runs-on: ${{ matrix.os }}
     steps:
+      # ==== Pre-Build: Set environment vars ====
+      # Needs to be in a separate step than build so that setting the environment var takes effect
+      #
+      - name: Pre-Build Linux/MacOS
+        if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64')
+        shell: bash
+        run: |
+          echo "SDCC_VER=14068" >> $GITHUB_ENV
+          echo "BUILD_PACKAGE_FILENAME=sdcc-14068-${{ matrix.name }}.tar.gz" >> $GITHUB_ENV
 
-      # ==== Download sources ====
-      - name: Linux Depends
+      # ==== Install Dependencies ====
+      - name: Install Dependencies
+        if: (matrix.name == 'Linux-x64')
+        run: |
+          # Packages (some may already be present)
+          sudo apt-get install flex bison libboost-dev texinfo zlib1g zlib1g-dev
+
+      # ==== Download SDCC sources ====
+      - name: Download SDCC Sources
         if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64')
         run: |
-          # To generate a given source tarball, but it can take a while sometimes
-          # https://sourceforge.net/p/sdcc/code/12539/tarball?path=
-          # That eventually generates:
-          # 
-          # curl -Lo sdcc.zip https://sourceforge.net/code-snapshots/svn/s/sd/sdcc/code/sdcc-code-r12539-trunk.zip
-          # Use a cached version for now, faster.
-           curl -Lo sdcc.zip https://github.com/bbbbbr/gbdk-2020-sdcc/releases/download/sdcc-src-12539-trunk/SDCC-download-snapshot-generated--sdcc-code-r12539-trunk.zip
-          unzip sdcc.zip          
-          # tar xvf sdcc.tar
-          curl -Lo boost.tar.gz https://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.gz/download
-          tar xvfz boost.tar.gz
-
-#      - name: Install boost
-        # if: (matrix.name == 'Linux-x64')
-#        uses: MarkusJx/install-boost@v2.0.0
-#        id: install-boost
-#        with:
-          # REQUIRED: Specify the required boost version
-          # A list of supported versions can be found here: 
-          # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
-          # boost_version: 1.73.0
-          # (1.59 isn't required but it seems there is some preference for older. see SDCC Changelog)
-#          boost_version: 1.59.0 <-- Not supported
-          # OPTIONAL: Specify a platform version
-#          platform_version: 18.04
-          # OPTIONAL: Specify a custom install location
-          # boost_install_dir: /home/runner/some_directory
-
-          # NOTE: If a boost version matching all requirements cannot be found,
-          # this build step will fail
+          # Checkout SDCC source
+          svn checkout -r $SDCC_VER svn://svn.code.sf.net/p/sdcc/code/trunk sdcc-${{ env.SDCC_VER }}
 
       # ==== Build SDCC ====
       - name: Build SDCC
         if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64')
         shell: bash
         run: |    
-          cd sdcc-code-r12539-trunk/sdcc
-          # cd sdcc
-          # For mingw64 cross build: --host=x86_64-w64-mingw32
-          ./configure --enable-gbz80-port --enable-z80-port --with-boost=/home/runner/work/gbdk-2020-sdcc/gbdk-2020-sdcc//boost_1_59_0/boost --disable-mcs51-port --disable-z180-port --disable-r2k-port --disable-r2ka-port --disable-r3ka-port --disable-tlcs90-port --disable-ez80_z80-port --disable-z80n-port --disable-ds390-port --disable-ds400-port --disable-pic14-port --disable-pic16-port --disable-hc08-port --disable-s08-port --disable-stm8-port --disable-pdk13-port --disable-pdk14-port --disable-pdk15-port --disable-ucsim --disable-doc
+          cd sdcc-${{ env.SDCC_VER }}/sdcc
+          ./configure  --enable-gbz80-port  --enable-z80-port  --enable-mos6502-port  --enable-mos65c02-port  --disable-mcs51-port  --disable-z180-port  --disable-r2k-port  --disable-r2ka-port  --disable-r3ka-port  --disable-tlcs90-port  --disable-ez80_z80-port  --disable-z80n-port  --disable-ds390-port  --disable-ds400-port  --disable-pic14-port  --disable-pic16-port  --disable-hc08-port  --disable-s08-port  --disable-stm8-port  --disable-pdk13-port  --disable-pdk14-port  --disable-pdk15-port  --disable-ucsim  --disable-doc  --disable-device-lib 
           make
-          cd bin
-          strip *
-          cd
+          # New sdcc build no longer copies some binaries to bin
+          cp src/sdcc bin
+          cp support/sdbinutils/binutils/sdar bin
+          cp support/sdbinutils/binutils/sdranlib bin
+          cp support/sdbinutils/binutils/sdobjcopy bin
+          cp support/sdbinutils/binutils/nm bin
+          cp support/cpp/gcc/cc1 bin
+          strip bin/*
+          cd ../..
 
-          
+      # ==== Packaging ====
+      - name: Package build Linux/MacOS
+        if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64')
+        shell: bash
+        run: |
+          cd ${{ env.SDCC_VER }}/sdcc
+          tar czf ../../${{ env.BUILD_PACKAGE_FILENAME }} bin
+          cd ../..
+
+      - name: Store build
+        if: (matrix.name == 'Linux-64') || (matrix.name == 'MacOS-64')
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.name }} build
+          path: ${{ env.BUILD_PACKAGE_FILENAME }}
+          # retention-days: 14
