@@ -53,14 +53,17 @@ jobs:
           ./configure  --enable-gbz80-port  --enable-z80-port  --enable-mos6502-port  --enable-mos65c02-port  --disable-mcs51-port  --disable-z180-port  --disable-r2k-port  --disable-r2ka-port  --disable-r3ka-port  --disable-tlcs90-port  --disable-ez80_z80-port  --disable-z80n-port  --disable-ds390-port  --disable-ds400-port  --disable-pic14-port  --disable-pic16-port  --disable-hc08-port  --disable-s08-port  --disable-stm8-port  --disable-pdk13-port  --disable-pdk14-port  --disable-pdk15-port  --disable-ucsim  --disable-doc  --disable-device-lib 
           make
           # New sdcc build no longer copies some binaries to bin
+          find *
+          ls -la bin
           cp src/sdcc bin
           cp support/sdbinutils/binutils/sdar bin
           cp support/sdbinutils/binutils/sdranlib bin
           cp support/sdbinutils/binutils/sdobjcopy bin
-          cp support/sdbinutils/binutils/nm bin
+          cp support/sdbinutils/binutils/sdnm bin
           cp support/cpp/gcc/cc1 bin
           strip bin/*
           cd ../..
+          ls -la bin
 
       # ==== Packaging ====
       - name: Package build Linux/MacOS
