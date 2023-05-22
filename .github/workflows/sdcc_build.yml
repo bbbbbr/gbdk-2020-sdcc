@@ -80,8 +80,9 @@ jobs:
 
       - name: Store build
         if: (matrix.name == 'Linux-64') || (matrix.name == 'MacOS-64')
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.name }} build
+          name: ${{ matrix.name }}-build
           path: gbdk-2020-sdcc/${{ env.BUILD_PACKAGE_FILENAME }}
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
           # retention-days: 14
