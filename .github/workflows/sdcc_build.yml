@@ -55,15 +55,17 @@ jobs:
           # New sdcc build no longer copies some binaries to bin
           find *
           ls -la bin
-          cp src/sdcc bin
-          cp support/sdbinutils/binutils/sdar bin
-          cp support/sdbinutils/binutils/sdranlib bin
-          cp support/sdbinutils/binutils/sdobjcopy bin
-          cp support/sdbinutils/binutils/sdnm bin
-          cp support/cpp/gcc/cc1 bin
+          cp -f src/sdcc bin
+          cp -f support/sdbinutils/binutils/sdar bin
+          cp -f support/sdbinutils/binutils/sdranlib bin
+          cp -f support/sdbinutils/binutils/sdobjcopy bin
+          cp -f support/sdbinutils/binutils/sdnm bin
+          cp -f support/cpp/gcc/cc1 bin
+          cp -f support/cpp/gcc/cpp sdcpp
           strip bin/*
+          ls -la bin          
           cd ../..
-          ls -la bin
+
 
       # ==== Packaging ====
       - name: Package build Linux/MacOS
