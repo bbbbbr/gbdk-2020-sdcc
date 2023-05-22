@@ -42,7 +42,7 @@ jobs:
         if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64')
         run: |
           # Checkout SDCC source
-          svn checkout -r $SDCC_VER svn://svn.code.sf.net/p/sdcc/code/trunk sdcc-${{ env.SDCC_VER }}
+          svn checkout -q -r $SDCC_VER svn://svn.code.sf.net/p/sdcc/code/trunk sdcc-${{ env.SDCC_VER }}
 
       # ==== Build SDCC ====
       - name: Build SDCC
@@ -83,5 +83,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.name }} build
-          path: ${{ env.BUILD_PACKAGE_FILENAME }}
+          path: gbdk-2020-sdcc/${{ env.BUILD_PACKAGE_FILENAME }}
           # retention-days: 14
