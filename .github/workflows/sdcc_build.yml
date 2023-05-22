@@ -75,6 +75,8 @@ jobs:
           cd sdcc-${{ env.SDCC_VER }}/sdcc
           tar cvzf ../../${{ env.BUILD_PACKAGE_FILENAME }} bin
           cd ../..
+          pwd
+          ls -la
 
       - name: Store build
         if: (matrix.name == 'Linux-64') || (matrix.name == 'MacOS-64')
