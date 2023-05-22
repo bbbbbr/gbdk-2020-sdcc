@@ -72,8 +72,8 @@ jobs:
         if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64')
         shell: bash
         run: |
-          cd ${{ env.SDCC_VER }}/sdcc
-          tar czf ../../${{ env.BUILD_PACKAGE_FILENAME }} bin
+          cd sdcc-${{ env.SDCC_VER }}/sdcc
+          tar cvzf ../../${{ env.BUILD_PACKAGE_FILENAME }} bin
           cd ../..
 
       - name: Store build
