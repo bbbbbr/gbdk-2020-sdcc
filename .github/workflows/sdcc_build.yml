@@ -69,7 +69,7 @@ jobs:
           # Checkout SDCC source
           svn checkout -q -r $SDCC_VER svn://svn.code.sf.net/p/sdcc/code/trunk sdcc-${{ env.SDCC_VER }}
 
-      # ==== Build SDCC ====
+      # ==== Build SDCC Linux / MacOS ====
       - name: Build SDCC Linux / MacOS
         if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64')
         shell: bash
@@ -91,20 +91,19 @@ jobs:
           ls -la bin          
           cd ../..
 
-      # ==== Build SDCC ====
+      # ==== Build SDCC WinCross ====
       - name: Build SDCC WinCross
         if: (matrix.name == 'WinCross-On-Linux')
         shell: bash
         run: |    
           cd sdcc-${{ env.SDCC_VER }}/sdcc
-          # 64 bit build
+          #
+          # Run 64 bit WinCross build
+          #
           ./configure   --enable-sm83-port --enable-z80-port  --enable-mos6502-port   --disable-mcs51-port   --disable-z180-port   --disable-r2k-port   --disable-r2ka-port   --disable-r3ka-port   --disable-tlcs90-port   --disable-ez80_z80-port   --disable-z80n-port   --disable-ds390-port   --disable-ds400-port   --disable-pic14-port   --disable-pic16-port   --disable-hc08-port   --disable-s08-port   --disable-stm8-port   --disable-pdk13-port   --disable-pdk14-port   --disable-pdk15-port   --disable-ucsim   --disable-doc   --disable-device-lib   --host=x86_64-w64-mingw32
           make
-          # Is this needed? It might get skipped on some builds
-          # cd support/packihx bin
-          # make
           # New sdcc build no longer copies some binaries to bin
-          find *
+          # find *
           ls -la bin
           cp -f src/sdcc.exe bin
           cp -f support/sdbinutils/binutils/sdar.exe bin
@@ -114,7 +113,33 @@ jobs:
           cp -f support/cpp/gcc/cc1.exe bin
           cp -f support/cpp/gcc/cpp.exe bin/sdcpp.exe
           strip bin/* || true
-          ls -la bin          
+          ls -la bin
+          # Copy binaries from the 64 bit build to another folder
+          cp -f -r bin win_64 || true
+          #
+          # Run 32 bit WinCross build
+          #
+          make clean || true
+          ./configure   --enable-sm83-port --enable-z80-port  --enable-mos6502-port   --disable-mcs51-port   --disable-z180-port   --disable-r2k-port   --disable-r2ka-port   --disable-r3ka-port   --disable-tlcs90-port   --disable-ez80_z80-port   --disable-z80n-port   --disable-ds390-port   --disable-ds400-port   --disable-pic14-port   --disable-pic16-port   --disable-hc08-port   --disable-s08-port   --disable-stm8-port   --disable-pdk13-port   --disable-pdk14-port   --disable-pdk15-port   --disable-ucsim   --disable-doc   --disable-device-lib   --host=i686-w64-mingw32
+          make
+          ls -la bin
+          cp -f src/sdcc.exe bin
+          cp -f support/sdbinutils/binutils/sdar.exe bin
+          cp -f support/sdbinutils/binutils/sdranlib.exe bin
+          cp -f support/sdbinutils/binutils/sdobjcopy.exe bin
+          cp -f support/sdbinutils/binutils/sdnm.exe bin
+          cp -f support/cpp/gcc/cc1.exe bin
+          cp -f support/cpp/gcc/cpp.exe bin/sdcpp.exe
+          strip bin/* || true
+          ls -la bin
+          # Copy binaries from the 32 bit build to another folder
+          cp -f -r bin win_32 || true
+          # Re-arrange files so there is a bin folder with just win_c32 and win_x64 subfolders
+          mv bin bin_old
+          mkdir -p bin
+          mv -f win_64 bin
+          mv -f win_32 bin          
+          # Done
           cd ../..
 
       # ==== Packaging ====
