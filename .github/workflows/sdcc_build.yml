@@ -34,9 +34,8 @@ jobs:
         if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64') || (matrix.name == 'WinCross-On-Linux')
         shell: bash
         run: |
-          export SDCC_VERSION=${{ inputs.sdcc_version_num }}
-          echo "SDCC_VER=$SDCC_VERSION" >> $GITHUB_ENV
-          echo "BUILD_PACKAGE_FILENAME=sdcc-$SDCC_VERSION-${{ matrix.name }}.tar.gz" >> $GITHUB_ENV
+          echo "SDCC_VER=${{ inputs.sdcc_version_num }}" >> $GITHUB_ENV
+          echo "BUILD_PACKAGE_FILENAME=sdcc-${{ inputs.sdcc_version_num }}-${{ matrix.name }}.tar.gz" >> $GITHUB_ENV
 
       # ==== Install Dependencies ====
       - name: Install Dependencies Linux
@@ -72,7 +71,7 @@ jobs:
         if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64') || (matrix.name == 'WinCross-On-Linux')
         run: |
           # Checkout SDCC source
-          svn checkout -q -r $SDCC_VER svn://svn.code.sf.net/p/sdcc/code/trunk sdcc-${{ env.SDCC_VER }}
+          svn checkout -q -r ${{ env.SDCC_VER }} svn://svn.code.sf.net/p/sdcc/code/trunk sdcc-${{ env.SDCC_VER }}
 
       # ==== Build SDCC Linux / MacOS ====
       - name: Build SDCC Linux / MacOS
