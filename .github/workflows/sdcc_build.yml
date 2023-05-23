@@ -8,7 +8,12 @@ on:
   #   branches: [ develop ]
   # pull_request:
   #   branches: [ develop ]
-
+    inputs:
+      sdcc_version_num:
+        description: 'SDCC Version Number (ex: 13911, 14068)'
+        default: '14068'
+        required: true
+        type: string
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -29,7 +34,7 @@ jobs:
         if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64') || (matrix.name == 'WinCross-On-Linux')
         shell: bash
         run: |
-          export SDCC_VERSION=14068
+          export SDCC_VERSION=${{ inputs.sdcc_version_num }}
           echo "SDCC_VER=$SDCC_VERSION" >> $GITHUB_ENV
           echo "BUILD_PACKAGE_FILENAME=sdcc-$SDCC_VERSION-${{ matrix.name }}.tar.gz" >> $GITHUB_ENV
 
