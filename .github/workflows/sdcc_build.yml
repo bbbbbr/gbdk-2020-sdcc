@@ -20,10 +20,10 @@ jobs:
     strategy:
       matrix:
         include:
-#          - os: ubuntu-20.04
-#            name: Linux-x64
-#          - os: ubuntu-20.04
-#            name: WinCross-On-Linux
+          - os: ubuntu-20.04
+            name: Linux-x64
+          - os: ubuntu-20.04
+            name: WinCross-On-Linux
           - os: macos-11
             name: MacOS-x64
     steps:
@@ -169,7 +169,7 @@ jobs:
         if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64') || (matrix.name == 'WinCross-On-Linux')
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.name }}-build
+          name: sdcc-SDCC_VER=${{ inputs.sdcc_version_num }}-${{ matrix.name }}-build
           path: ${{ env.BUILD_PACKAGE_FILENAME }}
           if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
           # retention-days: 14
