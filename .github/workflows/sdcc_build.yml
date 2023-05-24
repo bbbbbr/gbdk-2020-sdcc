@@ -87,8 +87,10 @@ jobs:
             echo "Patch sdcc: no file specified"
           else
             echo "Patch sdcc: ${{ inputs.sdcc_patch_file_url }}"
+            cd sdcc-${{ env.SDCC_VER }}/sdcc
             curl -Lo gbdk-sdcc-patch-file ${{ inputs.sdcc_patch_file_url }}
             patch -p0 -f < gbdk-sdcc-patch-file
+            cd ../..
           fi   
 
       # ==== Build SDCC Linux / MacOS ====
