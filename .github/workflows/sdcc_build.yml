@@ -15,7 +15,7 @@ on:
         required: true
         type: string
       sdcc_patch_file_url:
-        description: 'url for sdcc patch file (blank for none) (sdcc dir as root)'
+        description: 'url for sdcc patch file (blank for none) (-p0, sdcc dir as root)'
         default: 'https://github.com/gbdk-2020/gbdk-2020-sdcc/releases/download/patches/gbdk-4.1.0-sdldz80-sms-virt-addr.patch'
         type: string        
 jobs:
