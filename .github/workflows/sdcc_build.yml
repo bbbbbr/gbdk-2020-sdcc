@@ -15,7 +15,7 @@ on:
         required: true
         type: string
       sdcc_patch_file_url:
-        description: 'url for sdcc patch file (blank for none. made within /sdcc/)'
+        description: 'url for sdcc patch file (blank for none) (sdcc dir as root)'
         default: 'https://github.com/gbdk-2020/gbdk-2020-sdcc/releases/download/patches/gbdk-4.1.0-sdldz80-sms-virt-addr.patch'
         type: string        
 jobs:
@@ -83,7 +83,7 @@ jobs:
           # Checkout SDCC source
           svn checkout -q -r ${{ env.SDCC_VER }} svn://svn.code.sf.net/p/sdcc/code/trunk sdcc-${{ env.SDCC_VER }}
           # Apply patch file to source of applicable
-          if [ "${{ inputs.sdcc_patch_file_url }}" != "" ]; then
+          if [ "${{ inputs.sdcc_patch_file_url }}" = "" ]; then
             echo "Patch sdcc: no file specified"
           else
             echo "Patch sdcc: ${{ inputs.sdcc_patch_file_url }}"
