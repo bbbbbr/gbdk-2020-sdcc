@@ -14,6 +14,10 @@ on:
         default: '14068'
         required: true
         type: string
+      sdcc_patch_file_url:
+        description: 'url for sdcc patch file (blank for none. made within /sdcc/)'
+        default: 'https://github.com/gbdk-2020/gbdk-2020-sdcc/releases/download/patches/gbdk-4.1.0-sdldz80-sms-virt-addr.patch'
+        type: string        
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -22,10 +26,10 @@ jobs:
         include:
           - os: ubuntu-20.04
             name: Linux-x64
-          - os: ubuntu-20.04
-            name: WinCross-On-Linux
-          - os: macos-11
-            name: MacOS-x64
+#          - os: ubuntu-20.04
+#            name: WinCross-On-Linux
+#          - os: macos-11
+#            name: MacOS-x64
     steps:
       # ==== Pre-Build: Set environment vars ====
       # Needs to be in a separate step than build so that setting the environment var takes effect
@@ -78,6 +82,14 @@ jobs:
         run: |
           # Checkout SDCC source
           svn checkout -q -r ${{ env.SDCC_VER }} svn://svn.code.sf.net/p/sdcc/code/trunk sdcc-${{ env.SDCC_VER }}
+          # Apply patch file to source of applicable
+          if [ "${{ inputs.sdcc_patch_file_url }}" != "" ]; then
+            echo "Patch sdcc: no file specified"
+          else
+            echo "Patch sdcc: ${{ inputs.sdcc_patch_file_url }}"
+            curl -Lo gbdk-sdcc-patch-file ${{ inputs.sdcc_patch_file_url }}
+            patch -p0 -f < gbdk-sdcc-patch-file
+          fi   
 
       # ==== Build SDCC Linux / MacOS ====
       - name: Build SDCC Linux / MacOS
