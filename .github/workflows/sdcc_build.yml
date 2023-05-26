@@ -118,7 +118,11 @@ jobs:
           cp -f support/cpp/gcc/cc1 bin
           cp -f support/cpp/gcc/cpp bin/sdcpp
           strip bin/* || true
-          ls -la bin          
+          # Move cc1 to it's special hardwired path
+          mkdir libexec
+          mkdir libexec/sdcc
+          mv bin/cc1 libexec/sdcc
+          ls -la bin
           cd ../..
 
       # ==== Build SDCC WinCross 32 and 64 bit stages ====
@@ -139,6 +143,10 @@ jobs:
           cp -f support/cpp/gcc/cc1.exe bin
           cp -f support/cpp/gcc/cpp.exe bin/sdcpp.exe
           strip bin/* || true
+          # Move cc1 to it's special hardwired path
+          mkdir libexec
+          mkdir libexec/sdcc
+          mv bin/cc1 libexec/sdcc
           ls -la bin
           cd ../..
 
@@ -160,6 +168,10 @@ jobs:
           cp -f support/cpp/gcc/cc1.exe bin
           cp -f support/cpp/gcc/cpp.exe bin/sdcpp.exe
           strip bin/* || true
+          # Move cc1 to it's special hardwired path
+          mkdir libexec
+          mkdir libexec/sdcc
+          mv bin/cc1 libexec/sdcc
           ls -la bin
           cd ../..
 
@@ -169,7 +181,7 @@ jobs:
         shell: bash
         run: |
           cd sdcc-${{ env.SDCC_VER }}/sdcc
-          tar cvzf ../../${{ env.BUILD_PACKAGE_FILENAME }} bin
+          tar cvzf ../../${{ env.BUILD_PACKAGE_FILENAME }} bin libexec
           cd ../..
           pwd
           ls -la
