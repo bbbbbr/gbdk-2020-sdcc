@@ -201,7 +201,7 @@ jobs:
         shell: bash
         run: |
           cd sdcc-${{ env.SDCC_VER }}
-          tar cvzf ../../${{ env.BUILD_PACKAGE_FILENAME }} sdcc/bin sdcc/libexec
+          tar cvzf ../${{ env.BUILD_PACKAGE_FILENAME }} sdcc/bin sdcc/libexec
           cd ..
           pwd
           ls -la
