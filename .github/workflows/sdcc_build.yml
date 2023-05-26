@@ -118,6 +118,10 @@ jobs:
           cp -f support/cpp/gcc/cc1 bin
           cp -f support/cpp/gcc/cpp bin/sdcpp
           strip bin/* || true
+          # remove .in mapping files, etc
+          rm -f bin/*.in
+          rm -f bin/Makefile
+          rm -f bin/README          
           # Move cc1 to it's special hardwired path
           mkdir libexec
           mkdir libexec/sdcc
@@ -143,6 +147,12 @@ jobs:
           cp -f support/cpp/gcc/cc1.exe bin
           cp -f support/cpp/gcc/cpp.exe bin/sdcpp.exe
           strip bin/* || true
+          # remove .in mapping files, etc
+          rm -f bin/*.in
+          rm -f bin/Makefile
+          rm -f bin/README
+          # Remove shim non-binary files with the same names to avoid confusing Windows later on
+          rm -f bin/sdcc bin/sdcpp bin/sdar bin/sdnm bin/sdranlib bin/sdobjcopy
           # Move cc1 to it's special hardwired path
           mkdir libexec
           mkdir libexec/sdcc
@@ -170,6 +180,12 @@ jobs:
           cp -f support/cpp/gcc/cc1.exe bin
           cp -f support/cpp/gcc/cpp.exe bin/sdcpp.exe
           strip bin/* || true
+          # remove .in mapping files, etc
+          rm -f bin/*.in
+          rm -f bin/Makefile
+          rm -f bin/README
+          # Remove shim non-binary files with the same names to avoid confusing Windows later on
+          rm -f bin/sdcc bin/sdcpp bin/sdar bin/sdnm bin/sdranlib bin/sdobjcopy
           # Move cc1 to it's special hardwired path
           mkdir libexec
           mkdir libexec/sdcc
@@ -184,9 +200,9 @@ jobs:
         if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64') || (matrix.name == 'Win32-On-Linux') || (matrix.name == 'Win64-On-Linux')
         shell: bash
         run: |
-          cd sdcc-${{ env.SDCC_VER }}/sdcc
-          tar cvzf ../../${{ env.BUILD_PACKAGE_FILENAME }} bin libexec
-          cd ../..
+          cd sdcc-${{ env.SDCC_VER }}
+          tar cvzf ../../${{ env.BUILD_PACKAGE_FILENAME }} sdcc/bin sdcc/libexec
+          cd ..
           pwd
           ls -la
 
