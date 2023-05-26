@@ -146,7 +146,9 @@ jobs:
           # Move cc1 to it's special hardwired path
           mkdir libexec
           mkdir libexec/sdcc
-          mv bin/cc1 libexec/sdcc
+          # Not sure this has been resolved, but absurdly the windows build of sdcpp.exe (cpp.exe)
+          # can't find cc1 if it has the .exe extension, so strip that when copying
+          mv bin/cc1.exe libexec/sdcc/cc1
           ls -la bin
           cd ../..
 
@@ -171,7 +173,9 @@ jobs:
           # Move cc1 to it's special hardwired path
           mkdir libexec
           mkdir libexec/sdcc
-          mv bin/cc1 libexec/sdcc
+          # Not sure this has been resolved, but absurdly the windows build of sdcpp.exe (cpp.exe)
+          # can't find cc1 if it has the .exe extension, so strip that when copying
+          mv bin/cc1.exe libexec/sdcc/cc1
           ls -la bin
           cd ../..
 
