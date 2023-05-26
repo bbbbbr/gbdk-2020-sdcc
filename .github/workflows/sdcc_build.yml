@@ -24,18 +24,20 @@ jobs:
     strategy:
       matrix:
         include:
+#          - os: ubuntu-20.04
+#            name: Linux-x64
           - os: ubuntu-20.04
-            name: Linux-x64
+            name: Win32-On-Linux
           - os: ubuntu-20.04
-            name: WinCross-On-Linux
-          - os: macos-11
-            name: MacOS-x64
+            name: Win64-On-Linux
+#          - os: macos-11
+#            name: MacOS-x64
     steps:
       # ==== Pre-Build: Set environment vars ====
       # Needs to be in a separate step than build so that setting the environment var takes effect
       #
       - name: Pre-Build Linux/MacOS
-        if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64') || (matrix.name == 'WinCross-On-Linux')
+        if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64') || (matrix.name == 'Win32-On-Linux') || (matrix.name == 'Win64-On-Linux')
         shell: bash
         run: |
           echo "SDCC_VER=${{ inputs.sdcc_version_num }}" >> $GITHUB_ENV
@@ -54,8 +56,10 @@ jobs:
           # Packages (some may already be present)
           brew install flex bison boost texinfo zlib subversion
 
+      # This could be split apart to separate 32 and 64 bit, but doesn't
+      # take much time and is easier to keep in sync as one stage.
       - name: Install Dependencies WinCross
-        if: (matrix.name == 'WinCross-On-Linux')
+        if: (matrix.name == 'Win32-On-Linux') || (matrix.name == 'Win64-On-Linux')
         run: |
           # Packages (some may already be present)
           sudo apt-get -y install flex bison libboost-dev texinfo zlib1g zlib1g-dev g++ make mingw-w64 gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 wine64 subversion
@@ -78,7 +82,7 @@ jobs:
 
       # ==== Download SDCC sources ====
       - name: Download SDCC Sources
-        if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64') || (matrix.name == 'WinCross-On-Linux')
+        if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64') || (matrix.name == 'Win32-On-Linux') || (matrix.name == 'Win64-On-Linux')
         run: |
           # Checkout SDCC source
           svn checkout -q -r ${{ env.SDCC_VER }} svn://svn.code.sf.net/p/sdcc/code/trunk sdcc-${{ env.SDCC_VER }}
@@ -117,15 +121,32 @@ jobs:
           ls -la bin          
           cd ../..
 
-      # ==== Build SDCC WinCross ====
-      - name: Build SDCC WinCross
-        if: (matrix.name == 'WinCross-On-Linux')
+      # ==== Build SDCC WinCross 32 and 64 bit stages ====
+      - name: Build SDCC WinCross 32 Bit
+        if: (matrix.name == 'Win32-On-Linux')
         shell: bash
         run: |    
           cd sdcc-${{ env.SDCC_VER }}/sdcc
-          #
-          # Run 64 bit WinCross build
-          #
+          make clean || true
+          ./configure   --enable-sm83-port --enable-z80-port  --enable-mos6502-port   --disable-mcs51-port   --disable-z180-port   --disable-r2k-port   --disable-r2ka-port   --disable-r3ka-port   --disable-tlcs90-port   --disable-ez80_z80-port   --disable-z80n-port   --disable-ds390-port   --disable-ds400-port   --disable-pic14-port   --disable-pic16-port   --disable-hc08-port   --disable-s08-port   --disable-stm8-port   --disable-pdk13-port   --disable-pdk14-port   --disable-pdk15-port   --disable-ucsim   --disable-doc   --disable-device-lib   --host=i686-w64-mingw32
+          make
+          ls -la bin
+          cp -f src/sdcc.exe bin
+          cp -f support/sdbinutils/binutils/sdar.exe bin
+          cp -f support/sdbinutils/binutils/sdranlib.exe bin
+          cp -f support/sdbinutils/binutils/sdobjcopy.exe bin
+          cp -f support/sdbinutils/binutils/sdnm.exe bin
+          cp -f support/cpp/gcc/cc1.exe bin
+          cp -f support/cpp/gcc/cpp.exe bin/sdcpp.exe
+          strip bin/* || true
+          ls -la bin
+          cd ../..
+
+      - name: Build SDCC WinCross 64 Bit
+        if:  (matrix.name == 'Win64-On-Linux')
+        shell: bash
+        run: |    
+          cd sdcc-${{ env.SDCC_VER }}/sdcc
           ./configure   --enable-sm83-port --enable-z80-port  --enable-mos6502-port   --disable-mcs51-port   --disable-z180-port   --disable-r2k-port   --disable-r2ka-port   --disable-r3ka-port   --disable-tlcs90-port   --disable-ez80_z80-port   --disable-z80n-port   --disable-ds390-port   --disable-ds400-port   --disable-pic14-port   --disable-pic16-port   --disable-hc08-port   --disable-s08-port   --disable-stm8-port   --disable-pdk13-port   --disable-pdk14-port   --disable-pdk15-port   --disable-ucsim   --disable-doc   --disable-device-lib   --host=x86_64-w64-mingw32
           make
           # New sdcc build no longer copies some binaries to bin
@@ -140,37 +161,11 @@ jobs:
           cp -f support/cpp/gcc/cpp.exe bin/sdcpp.exe
           strip bin/* || true
           ls -la bin
-          # Copy binaries from the 64 bit build to another folder
-          cp -f -r bin win_64 || true
-          #
-          # Run 32 bit WinCross build
-          #
-          make clean || true
-          ./configure   --enable-sm83-port --enable-z80-port  --enable-mos6502-port   --disable-mcs51-port   --disable-z180-port   --disable-r2k-port   --disable-r2ka-port   --disable-r3ka-port   --disable-tlcs90-port   --disable-ez80_z80-port   --disable-z80n-port   --disable-ds390-port   --disable-ds400-port   --disable-pic14-port   --disable-pic16-port   --disable-hc08-port   --disable-s08-port   --disable-stm8-port   --disable-pdk13-port   --disable-pdk14-port   --disable-pdk15-port   --disable-ucsim   --disable-doc   --disable-device-lib   --host=i686-w64-mingw32
-          make
-          ls -la bin
-          cp -f src/sdcc.exe bin
-          cp -f support/sdbinutils/binutils/sdar.exe bin
-          cp -f support/sdbinutils/binutils/sdranlib.exe bin
-          cp -f support/sdbinutils/binutils/sdobjcopy.exe bin
-          cp -f support/sdbinutils/binutils/sdnm.exe bin
-          cp -f support/cpp/gcc/cc1.exe bin
-          cp -f support/cpp/gcc/cpp.exe bin/sdcpp.exe
-          strip bin/* || true
-          ls -la bin
-          # Copy binaries from the 32 bit build to another folder
-          cp -f -r bin win_32 || true
-          # Re-arrange files so there is a bin folder with just win_c32 and win_x64 subfolders
-          mv bin bin_old
-          mkdir -p bin
-          mv -f win_64 bin
-          mv -f win_32 bin          
-          # Done
           cd ../..
 
       # ==== Packaging ====
       - name: Package build Linux/MacOS
-        if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64') || (matrix.name == 'WinCross-On-Linux')
+        if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64') || (matrix.name == 'Win32-On-Linux') || (matrix.name == 'Win64-On-Linux')
         shell: bash
         run: |
           cd sdcc-${{ env.SDCC_VER }}/sdcc
@@ -180,7 +175,7 @@ jobs:
           ls -la
 
       - name: Store build
-        if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64') || (matrix.name == 'WinCross-On-Linux')
+        if: (matrix.name == 'Linux-x64') || (matrix.name == 'MacOS-x64') || (matrix.name == 'Win32-On-Linux') || (matrix.name == 'Win64-On-Linux')
         uses: actions/upload-artifact@v3
         with:
           name: sdcc-${{ inputs.sdcc_version_num }}-${{ matrix.name }}-build
