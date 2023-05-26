@@ -15,7 +15,7 @@ on:
         required: true
         type: string
       sdcc_patch_file_url:
-        description: 'url for sdcc patch file (blank for none) (-p0, sdcc dir as root)'
+        description: 'url for sdcc patch file ("none" without quotes for none) (-p0, sdcc dir as root)'
         default: 'https://github.com/gbdk-2020/gbdk-2020-sdcc/releases/download/patches/gbdk-4.1.0-sdldz80-sms-virt-addr.patch'
         type: string        
 jobs:
@@ -24,14 +24,14 @@ jobs:
     strategy:
       matrix:
         include:
-#          - os: ubuntu-20.04
-#            name: Linux-x64
+          - os: ubuntu-20.04
+            name: Linux-x64
           - os: ubuntu-20.04
             name: Win32-On-Linux
           - os: ubuntu-20.04
             name: Win64-On-Linux
-#          - os: macos-11
-#            name: MacOS-x64
+          - os: macos-11
+            name: MacOS-x64
     steps:
       # ==== Pre-Build: Set environment vars ====
       # Needs to be in a separate step than build so that setting the environment var takes effect
@@ -87,7 +87,7 @@ jobs:
           # Checkout SDCC source
           svn checkout -q -r ${{ env.SDCC_VER }} svn://svn.code.sf.net/p/sdcc/code/trunk sdcc-${{ env.SDCC_VER }}
           # Apply patch file to source of applicable
-          if [ "${{ inputs.sdcc_patch_file_url }}" = "" ]; then
+          if [ "${{ inputs.sdcc_patch_file_url }}" = "none" ]; then
             echo "Patch sdcc: no file specified"
           else
             echo "Patch sdcc: ${{ inputs.sdcc_patch_file_url }}"
