@@ -106,8 +106,8 @@ jobs:
           # Target older macOS version than whatever build OS is for better compatibility (Linux should ignore this)
           export MACOSX_DEPLOYMENT_TARGET=10.10
           cd sdcc-${{ env.SDCC_VER }}/sdcc
-          # "enable_shared" controls whether things such as sdar get statically linked
-          ./configure enable_shared=no --enable-gbz80-port  --enable-z80-port  --enable-mos6502-port  --enable-mos65c02-port  --disable-mcs51-port  --disable-z180-port  --disable-r2k-port  --disable-r2ka-port  --disable-r3ka-port  --disable-tlcs90-port  --disable-ez80_z80-port  --disable-z80n-port  --disable-ds390-port  --disable-ds400-port  --disable-pic14-port  --disable-pic16-port  --disable-hc08-port  --disable-s08-port  --disable-stm8-port  --disable-pdk13-port  --disable-pdk14-port  --disable-pdk15-port  --disable-ucsim  --disable-doc  --disable-device-lib 
+          # "disable-shared" helps make sdar get statically linked (could also try to apply this on just support/sdbinutils/binutils/)
+          ./configure --disable-shared --enable-gbz80-port  --enable-z80-port  --enable-mos6502-port  --enable-mos65c02-port  --disable-mcs51-port  --disable-z180-port  --disable-r2k-port  --disable-r2ka-port  --disable-r3ka-port  --disable-tlcs90-port  --disable-ez80_z80-port  --disable-z80n-port  --disable-ds390-port  --disable-ds400-port  --disable-pic14-port  --disable-pic16-port  --disable-hc08-port  --disable-s08-port  --disable-stm8-port  --disable-pdk13-port  --disable-pdk14-port  --disable-pdk15-port  --disable-ucsim  --disable-doc  --disable-device-lib 
           make
           # New sdcc build no longer copies some binaries to bin
           find *
@@ -138,9 +138,9 @@ jobs:
         run: |    
           cd sdcc-${{ env.SDCC_VER }}/sdcc
           make clean || true
-          # "enable_shared" controls whether things such as sdar get statically linked
+          # "disable-shared" helps make sdar get statically linked (could also try to apply this on just support/sdbinutils/binutils/)
           ./configure \
-          enable_shared=no \
+          --disable-nls --disable-shared \
           --prefix=/sdcc --datarootdir=/sdcc docdir=\${datarootdir}/doc include_dir_suffix=include non_free_include_dir_suffix=non-free/include lib_dir_suffix=lib non_free_lib_dir_suffix=non-free/lib sdccconf_h_dir_separator=\\\\  \
           --enable-sm83-port --enable-z80-port  --enable-mos6502-port   --disable-mcs51-port   --disable-z180-port   --disable-r2k-port   --disable-r2ka-port   --disable-r3ka-port   --disable-tlcs90-port   --disable-ez80_z80-port   --disable-z80n-port   --disable-ds390-port   --disable-ds400-port   --disable-pic14-port   --disable-pic16-port   --disable-hc08-port   --disable-s08-port   --disable-stm8-port   --disable-pdk13-port   --disable-pdk14-port   --disable-pdk15-port   --disable-ucsim   --disable-doc   --disable-device-lib   --host=i686-w64-mingw32
           make
@@ -173,9 +173,9 @@ jobs:
         shell: bash
         run: |    
           cd sdcc-${{ env.SDCC_VER }}/sdcc
-          # "enable_shared" controls whether things such as sdar get statically linked
+          # "disable-shared" helps make sdar get statically linked (could also try to apply this on just support/sdbinutils/binutils/)
           ./configure \
-          enable_shared=no \
+          --disable-nls --disable-shared \
           --prefix=/sdcc --datarootdir=/sdcc docdir=\${datarootdir}/doc include_dir_suffix=include non_free_include_dir_suffix=non-free/include lib_dir_suffix=lib non_free_lib_dir_suffix=non-free/lib sdccconf_h_dir_separator=\\\\ \
           --enable-sm83-port --enable-z80-port  --enable-mos6502-port   --disable-mcs51-port   --disable-z180-port   --disable-r2k-port   --disable-r2ka-port   --disable-r3ka-port   --disable-tlcs90-port   --disable-ez80_z80-port   --disable-z80n-port   --disable-ds390-port   --disable-ds400-port   --disable-pic14-port   --disable-pic16-port   --disable-hc08-port   --disable-s08-port   --disable-stm8-port   --disable-pdk13-port   --disable-pdk14-port   --disable-pdk15-port   --disable-ucsim   --disable-doc   --disable-device-lib   --host=x86_64-w64-mingw32
           make
